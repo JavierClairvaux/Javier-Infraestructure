@@ -1,0 +1,84 @@
+---
+- apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - ruby-full
+    - git-core
+    - curl
+    - zlib
+    - 1g-dev
+    - build-essential
+    - libpq-dev
+    - libreadline-dev
+    - libyaml-dev
+    - libsqlite3-dev
+    - sqlite3
+    - libxml2-dev
+    - libxslt1-dev
+    - libcurl4-openssl-dev
+    - python-software-properties
+    - libffi-dev
+    - nodejs
+    - libpq-dev
+  sudo: yes
+
+- name: download ruby2.3.3
+  get_url:
+    url: http://ftp.ruby-lang.org/pub/ruby/2.3/ruby-2.3.3.tar.gz
+    dest: /vagrant/home
+    mode: 0644
+- file:
+    path: "/vagrant/home/ruby2.3.3"
+    state: directory
+    mode: 0755
+    owner: tinkerware
+    group: tinkerware
+  sudo: yes
+
+- name: unpack ruby2.3.3
+  unarchive:
+    src: ruby2.3.3
+    dest: /vagrant/home/ruby2.3.3
+
+-name: install ruby2.3.3
+  command: ./configure
+  args:
+    chdir: /vagrant/home/ruby2.3.3
+
+- make:
+    chdir: /vagrant/home/ruby2.3.3
+
+- name: Install ruby2.3.3
+    make:
+    chdir: /vagrant/home/ruby2.3.3
+    target: install
+  sudo: yes
+
+-name: install bundler
+  command: gem install bundler
+  sudo: yes
+
+-name: install rails
+  command: gem install rails -v 5.0.0.1
+  sudo: yes
+
+-name: clone repo
+  git:
+    repo: https://github.com/RailsApps/learn-rails
+    dest: /vagrant/home
+
+-name: install repo
+  command: bundle install
+    args:
+      chdir: /vagrant/home/hello
+
+- name: Start aplication
+  shell: rails server --bind=0.0.0.0
+  args:
+    chdir: /vagrant/home/hello
+  with_dict: "/vagrant/home/hello"
+  when: rails_repos is defined
+  tags: run_rails
+  sudo: yes
+  sudo_user: tinkerware
