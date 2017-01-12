@@ -26,7 +26,7 @@
 - name: download ruby2.3.3
   get_url:
     url: http://ftp.ruby-lang.org/pub/ruby/2.3/ruby-2.3.3.tar.gz
-    dest: /vagrant/home
+    dest: /vagrant/home/ruby2.3.3.tar.gz
     mode: 0644
 - file:
     path: "/vagrant/home/ruby2.3.3"
@@ -38,11 +38,11 @@
 
 - name: unpack ruby2.3.3
   unarchive:
-    src: ruby2.3.3
+    src: /vagrant/home/ruby2.3.3.tar.gz
     dest: /vagrant/home/ruby2.3.3
 
 -name: install ruby2.3.3
-  command: ./configure
+ command: ./configure
   args:
     chdir: /vagrant/home/ruby2.3.3
 
@@ -50,35 +50,32 @@
     chdir: /vagrant/home/ruby2.3.3
 
 - name: Install ruby2.3.3
-    make:
+  make:
     chdir: /vagrant/home/ruby2.3.3
     target: install
   sudo: yes
 
 -name: install bundler
-  command: gem install bundler
-  sudo: yes
+ command: gem install bundler
+ sudo: yes
 
 -name: install rails
-  command: gem install rails -v 5.0.0.1
-  sudo: yes
+ command: gem install rails -v 5.0.0.1
+ sudo: yes
 
 -name: clone repo
-  git:
-    repo: https://github.com/RailsApps/learn-rails
-    dest: /vagrant/home
+ git:
+  repo: https://github.com/RailsApps/learn-rails
+  dest: /vagrant/home/learn-rails
 
 -name: install repo
-  command: bundle install
-    args:
-      chdir: /vagrant/home/hello
+ command: bundle install
+ args:
+    chdir: /vagrant/home/learn-rails
 
 - name: Start aplication
-  shell: rails server --bind=0.0.0.0
+  shell: nohup rails server --bind=0.0.0.0 &
   args:
     chdir: /vagrant/home/hello
-  with_dict: "/vagrant/home/hello"
-  when: rails_repos is defined
-  tags: run_rails
   sudo: yes
   sudo_user: tinkerware
